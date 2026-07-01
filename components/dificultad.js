@@ -54,6 +54,8 @@ useEffect(() => {
   }, []);
 
   useEffect(() => {
+    console.log('hola');
+    
     const lettersArray = dataTorneo.map((item) =>
       item.dificultad.split("").map(() => new Animated.Value(0))
     );

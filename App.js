@@ -49,6 +49,7 @@ const [amarillas,setAmarillas] = useState(0)
 const [goles,setGoles] = useState(0)
 const [arrayHeader,setArrayHeader] = useState([Balon,Balon,Balon,Balon,Balon,Balon,Balon,Trofeo])
 const [indexRespuesta,setIndexRespuesta] = useState(0)
+const [saludos,setSaludos] = useState()
 
 const [preguntarPermiso,setPreguntaPermiso] = useState(false)
 
@@ -94,6 +95,7 @@ const seleccionarIdioma = (index) => {
 }
 const seleccionandoDificultad = index =>{
     setJuegoTerminado(dataTorneo[index].juegoTerminado)
+    setSaludos(dataTorneo[index].saludos)
     setMostrarPublicidad(dataTorneo[index].publicidad)
     setDataTorneo(obtenerPreguntasAleatorias(dataTorneo[index]))
     setOption('4')
@@ -163,14 +165,14 @@ const preguntaSiguiente = () => {
       }
      
     }
+  console.log(juegoHaTerminado)
 
-
-
+//||  option === '9'
   return<View>
           <ImageBackground source={background} style={styles.backgroundStyle}>
            {
-              option === '4' ||  option === '5' || option === '6' || option === '7' ||  option === '9'?
-           <View style={[styles.resultContainer,{opacity:1}]}>
+              option === '4' ||  option === '5' || option === '6' || option === '7' || option === '9'?
+           <View style={[styles.resultContainer,{opacity: option!=='9'?1:0}]}>
                        {arrayHeader.map((item, index) => (
                          <Imagen key={index} item={item} width={imageHeading} height={imageHeading} margin={3} />
                            ))}
@@ -195,6 +197,7 @@ const preguntaSiguiente = () => {
                                             empezarDenuevo={empezarDenuevo}
                                              otraOportunidad={otraOportunidad}
                                                  oportuninades={oportuninades}
+                                                   saludos={saludos}
                                                   // prepareApp={prepareApp}
                                                  />:<></>}
             {
@@ -211,7 +214,7 @@ const styles = StyleSheet.create({
   backgroundStyle:{
     width,
     height,
-    opacity:0.9
+    opacity:1
   },
    resultContainer: {
     flexDirection: "row",

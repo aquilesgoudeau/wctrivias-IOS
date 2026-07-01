@@ -6,7 +6,7 @@ export default function shareExpo(){
     const onShare = async () => {
       try {
         const result = await Share.share({
-          message:urlDestination,
+          message:'https://wctrivias.com' //urlDestination,
         });
         if (result.action === Share.sharedAction) {
           if (result.activityType) {

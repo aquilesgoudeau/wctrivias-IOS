@@ -11,9 +11,11 @@ import Campion from "./campeon";
 
 export default function Menu({
     option,setOption,seleccionarIdioma,dataTorneo,seleccionandoDificultad,seleccionarElTorneo,seleccionarTorneoTitle,indexJuego,jugarTorneo,
-    preguntaSiguiente,indexRespuesta,empezarDenuevo,otraOportunidad,mostrarPublicidad,juegoHaTerminado,oportuninades //prepareApp
+    preguntaSiguiente,indexRespuesta,empezarDenuevo,otraOportunidad,mostrarPublicidad,juegoHaTerminado,oportuninades,saludos //prepareApp
     
 }){
+    console.log(option);
+    
     switch(option){
         case '1':
             return <Idiomas seleccionarIdioma={seleccionarIdioma} dataTorneo={dataTorneo} />
@@ -32,7 +34,7 @@ export default function Menu({
                                      case '8':
                                         return <JuegoTerminado empezarDenuevo={empezarDenuevo} juegoHaTerminado={juegoHaTerminado}/>
                                         case '9':
-                                            return <Campion indexJuego={indexJuego} dataTorneo={dataTorneo} indexRespuesta={indexRespuesta} empezarDenuevo={empezarDenuevo}/>
+                                            return <Campion indexJuego={indexJuego} dataTorneo={dataTorneo} indexRespuesta={indexRespuesta} empezarDenuevo={empezarDenuevo} saludos={saludos}/>
         default:
             return <Inicio setOption={setOption} />
     }

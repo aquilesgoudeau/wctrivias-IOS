@@ -9,6 +9,7 @@ import {
   Animated
 } from "react-native";
 import * as Device from 'expo-device'
+import ConfettiCannon from "react-native-confetti-cannon";
 import Trofeo from "../assets/imagenes/trofeo.webp";
 import ShareJuego from "../assets/imagenes/share.webp"
 import PlayAgain from "../assets/imagenes/playagain.webp"
@@ -21,7 +22,7 @@ const { width, height } = Dimensions.get('screen');
  const shorter = Math.min(width, height)
     /*
     Iphone */
-    const textPreguntaIphone = shorter <= 360 ? 15 : shorter >= 400 ? 20 : 16
+    const textPreguntaIphone = shorter <= 360 ? 17 : shorter >= 400 ? 23 : 19
     const textRespuestaIphone =shorter <= 360  ?12 : shorter >= 400 ? 16 : 13
     const justContentTestIphone =shorter <= 360 ?'flex-start' : 'space-evenly'  
     const imagencopaIphone = shorter <= 360  ?280 : shorter >= 400 ? 320 : 300
@@ -71,7 +72,7 @@ const { width, height } = Dimensions.get('screen');
 
     
 
-export default function Campion({empezarDenuevo,dataTorneo,indexJuego,indexRespuesta}) {
+export default function Campion({empezarDenuevo,dataTorneo,indexJuego,indexRespuesta,saludos}) {
   console.log(height);
   
   const preguntaCompleta =dataTorneo.preguntas[indexJuego]
@@ -79,148 +80,221 @@ export default function Campion({empezarDenuevo,dataTorneo,indexJuego,indexRespu
 
   const trofeoani = useRef(new Animated.Value(0)).current;
   const opacityAni = useRef(new Animated.Value(0.7)).current;
-  const animacionImages = useRef(new Animated.Value(0)).current
+  const cardAni = useRef(new Animated.Value(0)).current;
 
-  
-    
-    const crearSonido = async () =>{
-      await playSound(require('../assets/sonidos/iniciojuego.wav'),0.02)
-    } 
-  
-    useEffect(()=>{
-      crearSonido()
-    },[])
-  
+  const [explosions, setExplosions] = useState([]);
 
+  const smallTrophySize = imageLink * 0.8;
 
-  const particleCount = 100;
-  const [particles] = useState(
-    Array.from({ length: particleCount }, () => ({
-      left: Math.random() * width,
-      delay: Math.random() * 1000,
-      color: `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)`,
-      translateY: new Animated.Value(0),
-      opacity: new Animated.Value(1),
-    }))
-  );
+  const crearSonido = async () =>{
+    await playSound(require('../assets/sonidos/iniciojuego.wav'),0.02)
+  } 
+
+  useEffect(()=>{
+    crearSonido()
+  },[])
 
   useEffect(() => {
-    // Trofeo + FadeOut de contenido
+    // Trofeo + FadeOut de contenido + Transición al Card
     Animated.sequence([
+      // 1. Ocultar preguntas y respuestas (0ms a 1000ms)
       Animated.timing(opacityAni, {
         toValue: 0,
         duration: 1000,
         useNativeDriver: true,
       }),
+      // 2. Mostrar copa central (1000ms a 2000ms)
       Animated.timing(trofeoani, {
-        toValue: 0.9,
+        toValue: 1,
         duration: 1000,
         useNativeDriver: true,
       }),
-      
-      Animated.timing(animacionImages,{
-        toValue:1,
-        duration:1000,
-        delay:3000,
-        useNativeDriver:true
-      })
-    ]).start();
-
-    particles.forEach((particle) => {
+      // Esperar 2 segundos más para completar los 4 segundos del confeti (2000ms a 4000ms)
+      Animated.delay(2000),
+      // 3. Transición cruzada (Crossfade): desvanecer trofeo central y mostrar el Card (4000ms a 5500ms)
       Animated.parallel([
-        Animated.timing(particle.translateY, {
-          toValue: height, //+ 50,
-          duration: 2500,
-          delay: particle.delay,
-          useNativeDriver: true,
-        }),
-        Animated.timing(particle.opacity, {
+        Animated.timing(trofeoani, {
           toValue: 0,
-          duration: 2500,
-          delay: particle.delay,
+          duration: 1500,
           useNativeDriver: true,
         }),
-      ]).start();
-    });
+        Animated.timing(cardAni, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        })
+      ])
+    ]).start();
   }, []);
+
+  useEffect(() => {
+    // Retrasar el lanzamiento del confeti por 1000ms para que empiece exactamente 
+    // cuando el trofeo empieza a aparecer (Fase 2 de la instrucción).
+    const startConfettiTimeout = setTimeout(() => {
+      // Lanzar ráfaga masiva inicial exactamente en las coordenadas de la instrucción:
+      // - x: 0.2, y: 0.5 (lado izquierdo, altura media)
+      // - x: 0.8, y: 0.5 (lado derecho, altura media)
+      // - x: 0.5, y: 0.7 (centro, altura media-baja)
+      setExplosions([
+        { id: 'mb1', count: 150, origin: { x: width * 0.2, y: height * 0.5 } },
+        { id: 'mb2', count: 150, origin: { x: width * 0.8, y: height * 0.5 } },
+        { id: 'mb3', count: 200, origin: { x: width * 0.5, y: height * 0.7 } },
+      ]);
+
+      // Iniciar ráfagas continuas estilo fuegos artificiales durante 4 segundos
+      const duration = 4 * 1000;
+      const celebrationEnd = Date.now() + duration;
+
+      const intervalId = setInterval(() => {
+        const timeLeft = celebrationEnd - Date.now();
+        if (timeLeft <= 0) {
+          clearInterval(intervalId);
+          return;
+        }
+
+        const newExplosions = [];
+        const idPrefix = `exp_${Date.now()}_${Math.random()}`;
+
+        // Lluvia desde arriba (20 partículas en x aleatorio)
+        newExplosions.push({
+          id: `${idPrefix}_top`,
+          count: 20,
+          origin: { x: Math.random() * width, y: 0 }
+        });
+
+        // Explosión de las 4 esquinas (15 partículas cada una)
+        newExplosions.push(
+          { id: `${idPrefix}_tl`, count: 15, origin: { x: 0, y: height * 0.05 } },
+          { id: `${idPrefix}_tr`, count: 15, origin: { x: width, y: height * 0.05 } },
+          { id: `${idPrefix}_bl`, count: 15, origin: { x: 0, y: height * 1.15 } },
+          { id: `${idPrefix}_br`, count: 15, origin: { x: width, y: height * 1.15 } }
+        );
+
+        // 40% de probabilidad de explosión aleatoria en la pantalla (60 partículas)
+        if (Math.random() > 0.6) {
+          newExplosions.push({
+            id: `${idPrefix}_rand`,
+            count: 60,
+            origin: { x: Math.random() * width, y: Math.random() * (height * 0.9) }
+          });
+        }
+
+        setExplosions(prev => [...prev, ...newExplosions]);
+      }, 150);
+
+      activeTimers.push(intervalId);
+    }, 1000);
+
+    const activeTimers = [startConfettiTimeout];
+
+    return () => {
+      activeTimers.forEach(timer => {
+        clearTimeout(timer);
+        clearInterval(timer);
+      });
+    };
+  }, []);
+
   console.log(height/2);
   
   return (
-   <SafeAreaView style={styles.safeArea}>
-      <View style={styles.wrapper}>
-          <View style={[styles.container,{justifyContent:justContentTest}]}>
-             {particles.map((particle, i) => (
-                <Animated.View
-                  key={i}
-                     style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: 5,
-                    backgroundColor: particle.color,
-                    position: "absolute",
-                    top:-140,
-                    left: particle.left,
-                    transform: [{ translateY: particle.translateY }],
-                    opacity: particle.opacity,
-                  }}
-                />
-          ))}
-
-          
+   <View style={styles.fullScreenWrapper}>
+     <SafeAreaView style={styles.safeArea}>
+        <View style={styles.wrapper}>
+            <View style={[styles.container,{justifyContent:justContentTest}]}>
 
 
-          <Animated.View style={[styles.questionContainer, { opacity: opacityAni }]}>
-            <Text style={[styles.questionText]}>{preguntaCompleta}</Text>
-          </Animated.View>
 
-          <Animated.View style={[styles.answerList, { opacity: opacityAni }]}>
-            {menuRespuestas.map((respuesta, index) => (
-              <Pressable
-                key={index}
+            <Animated.View style={[styles.questionContainer, { opacity: opacityAni }]}>
+              <Text style={[styles.questionText]}>{preguntaCompleta}</Text>
+            </Animated.View>
+
+            <Animated.View style={[styles.answerList, { opacity: opacityAni }]}>
+              {menuRespuestas.map((respuesta, index) => (
+                <Pressable
+                  key={index}
+                  style={[
+                    styles.answerButton,
+                    { backgroundColor: index === indexRespuesta ? "#498c18" : "#145bde" },
+                  ]}
+                >
+                  <Text style={[styles.answerText]}>{respuesta}</Text>
+                </Pressable>
+              ))}
+            </Animated.View>
+
+
+            {/* Contenedor central absoluto que asegura centrado perfecto horizontal y vertical */}
+            <View style={styles.centerOverlay} pointerEvents="box-none">
+              
+              {/* Copa Central Animada */}
+              <Animated.View
                 style={[
-                  styles.answerButton,
-                  { backgroundColor: index === indexRespuesta ? "#498c18" : "#145bde" },
+                  styles.trofeoCentralContainer,
+                  { opacity: trofeoani }
                 ]}
               >
-                <Text style={[styles.answerText]}>{respuesta}</Text>
-              </Pressable>
-            ))}
-          </Animated.View>
+                <Imagen item={Trofeo} width={imagencopa} height={imagencopa} margin={0} />
+              </Animated.View>
 
-         
-          <Animated.View
-            style={[
-              {
-                position: "absolute",
-                top: imageCopaTop,
-                alignSelf: "center"
-              },
-              { opacity: trofeoani },
-            ]}
-          >
-            <Imagen item={Trofeo} width={imagencopa} height={imagencopa} margin={0} />
-          </Animated.View>
+              {/* Tarjeta de Felicitación / Card (Crossfade con la Copa Central) */}
+              <Animated.View
+                style={[
+                  styles.card,
+                  { opacity: cardAni }
+                ]}
+              >
+                <View style={styles.headerContainer}>
+                  <Text style={styles.congratulations}>
+                    {saludos}!
+                  </Text>
+                  <Imagen item={Trofeo} width={smallTrophySize} height={smallTrophySize} margin={0} />
+                </View>
 
-          <Animated.View style={[styles.actions,{opacity:animacionImages},{top:testLink}]}>
-                    <Pressable onPress={()=>empezarDenuevo()}>
-                      <Imagen item={PlayAgain} width={imageLink} height={imageLink} margin={0} />
-                    </Pressable>
-                    <Pressable onPress={()=>shareExpo()}>
-                      <Imagen item={ShareJuego} width={imageLink} height={imageLink} margin={0} />
-                    </Pressable>
-                  </Animated.View>
+                <View style={styles.contenedorOptiones}>
+                  <Pressable onPress={() => empezarDenuevo()} style={{ marginHorizontal: 15 }}>
+                    <Imagen item={PlayAgain} width={imageLink} height={imageLink} margin={0} />
+                  </Pressable>
+                  <Pressable onPress={() => shareExpo()} style={{ marginHorizontal: 15 }}>
+                    <Imagen item={ShareJuego} width={imageLink} height={imageLink} margin={0} />
+                  </Pressable>
+                </View>
+              </Animated.View>
+
+            </View>
 
 
-          </View>
-      </View>
-   </SafeAreaView>
+            </View>
+        </View>
+     </SafeAreaView>
+
+     {/* Contenedor de confeti absoluto que cubre toda la pantalla física sin restricciones de SafeAreaView */}
+     <View style={styles.absoluteConfettiContainer} pointerEvents="none">
+       {explosions.map(exp => (
+         <ConfettiCannon
+           key={exp.id}
+           count={exp.count}
+           origin={exp.origin}
+           fallSpeed={2500}
+           fadeOut={true}
+         />
+       ))}
+     </View>
+   </View>
   );
-}
+  }
 
-const styles = StyleSheet.create({
- safeArea: {
+  const styles = StyleSheet.create({
+  fullScreenWrapper: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: width,
+    height: height,
+  },
+  safeArea: {
     flex: 1
-   
+
   },
   wrapper: {
     flex: 1
@@ -282,12 +356,57 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
   },
-  actions: {
-    position:"absolute",
+  centerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  trofeoCentralContainer: {
+    position: "absolute",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  card: {
+    position: "absolute",
+    backgroundColor: "#f2f2f2",
+    padding: 25,
+    borderRadius: 20,
+    alignItems: "center",
+    width: "85%",
+    maxWidth: 400,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4
+  },
+  headerContainer: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
-    width: "80%",
-    borderRadius:20
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  congratulations: {
+    fontWeight: "900",
+    color: "#b30000",
+    textAlign: "center",
+    fontSize: textPregunta * 1.15,
+    marginRight: 10,
+
+  },
+  contenedorOptiones: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  absoluteConfettiContainer: {
+    position: "absolute",
+    top: -height * 0.15,
+    left: 0,
+    width: width,
+    height: height + 200,
+    zIndex: 9999
   }
 });
 

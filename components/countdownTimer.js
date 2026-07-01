@@ -6,7 +6,7 @@ import {playSound} from "../utilities/playSound"
 const { width } = Dimensions.get("screen");
 
 export default function CountDownTimer({ testRespuesta, testMenuRespuestas, indexjuego, jugarTorneo }) {
-  const [timeLeft, setTimeLeft] = useState(20);
+  const [timeLeft, setTimeLeft] = useState(40); //20
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
 

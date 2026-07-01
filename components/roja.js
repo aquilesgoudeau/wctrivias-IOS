@@ -19,7 +19,8 @@ const { width,height } = Dimensions.get("window");
   const shorter = Math.min(width, height)
     
     //Iphone
-    const textPreguntaIphone = shorter <= 360 ? 15 : shorter >= 400 ? 20 : 16
+
+    const textPreguntaIphone = shorter <= 360 ? 17 : shorter >= 400 ? 23 : 19
     const textRespuestaIphone =shorter <= 360  ?12 : shorter >= 400 ? 16 : 13
     const justContentTestIphone =shorter <= 360 ?'flex-start' : 'space-evenly'  
     const counterTestIphone =shorter >= 400 ? 26  :24
@@ -212,6 +213,7 @@ const styles = StyleSheet.create({
     fontSize:textRespuesta,
     color: "#fff",
     fontWeight: "600",
+    textAlign:"left"
   }
 });
 

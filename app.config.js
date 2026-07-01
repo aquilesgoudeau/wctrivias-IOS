@@ -5,7 +5,7 @@ export default () => {
   expo: {
     name: "wctrivias",
     slug: "wctrivias",
-    version: "1.1.7",
+    version: "1.1.8",
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
