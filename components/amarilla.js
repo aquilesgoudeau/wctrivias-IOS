@@ -1,3 +1,147 @@
+import React, { useEffect, useRef, useContext } from "react";
+import {
+  View,
+  Text,
+  Dimensions,
+  StyleSheet,
+  Pressable,
+  SafeAreaView,
+  Animated
+} from "react-native";
+import * as Device from 'expo-device'
+import {playSound} from "../utilities/playSound"
+import Imagen from "./imagen";
+import AmarillaTarjeta from "../assets/imagenes/amarilla.webp"
+import { Context as GameContext} from "../contexts/gameContext"
+const { width,height } = Dimensions.get("window");
+
+
+export default function Amarilla() {
+
+  const {state,preguntaSiguiente} = useContext(GameContext)
+
+  const {dataTorneo,indexJuego,indexRespuesta} = state
+
+  const preguntaCompleta =dataTorneo.preguntas[indexJuego]
+  const menuRespuestas = dataTorneo.menuRespuestas[indexJuego]
+  const testRespuesta = dataTorneo.respuestas[indexJuego]
+
+  const opacity = useRef(new Animated.Value(0)).current;
+  
+  const crearSonido = async () =>{
+    await playSound(require('../assets/sonidos/silvato.wav'),0.02)
+  } 
+
+  useEffect(()=>{
+    crearSonido()
+  },[])
+
+  useEffect(() => {
+    Animated.timing(opacity,{
+      toValue:1,
+      duration:1000,
+      useNativeDriver:true
+    }).start();
+    setTimeout(()=>preguntaSiguiente(),3000)
+  }, []);
+
+return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={[styles.wrapper]}>
+        <View style={[styles.container]}>
+          <View style={styles.questionContainer}>
+             <Text style={[styles.questionText]}>{preguntaCompleta}</Text>
+               </View>
+                  <View style={styles.answerList}>
+                    {menuRespuestas.map((respuesta, index) => (
+                      <Pressable key={index} style={[styles.answerButton,{backgroundColor:index === indexRespuesta?"#e34e49":testRespuesta===respuesta?"#33cc33":"#145bde"}]}>
+                        <Text style={[styles.answerText]}>{respuesta}</Text>
+                          </Pressable>
+                            ))}
+                             </View>
+                                <Animated.View style={[{opacity:opacity},{position:"absolute",top:5,alignSelf:"center"}]}>
+                                    <Imagen item={AmarillaTarjeta} width={300} height={400} margin={0} />
+                                        </Animated.View>
+                                            </View>
+                                                </View>
+                                                    </SafeAreaView>
+                                                                  );
+}
+
+const styles = StyleSheet.create({
+ safeArea: {
+    flex: 1
+  },
+  wrapper: {
+    flex: 1,
+    marginTop:30
+  },
+  container: {
+    flexGrow: 1,
+    justifyContent:"flex-start",  //justContentTest,
+    alignItems: "center",
+    paddingVertical: 10,
+    marginTop:10
+  },
+  
+  counterContainer: {
+    margin:1
+  },
+  counterText: {
+    fontSize:14,
+    fontWeight: "800",
+    color: "#fcfaf7",
+    borderColor: "#fcfaf7",
+    opacity:1
+  },
+  questionContainer: {
+    backgroundColor: "#e6f0ff",
+    padding: 25,
+    borderRadius:10,
+    marginBottom: 20,
+    width:width*0.9,
+    alignItems: "center",
+    opacity: 0.9,
+    marginTop:20,
+    marginBottom:30
+  },
+  questionText: {
+    fontSize:19,
+    color: "#800000",
+    fontWeight: "900",
+    textAlign: "center",
+  },
+  answerList: {
+    width:width * 0.8,
+    marginTop:20,
+    gap: 10
+  },
+  answerButton: {
+    backgroundColor: "#003d99",
+    borderColor: "#fff",
+    borderWidth: 3,
+    borderRadius:10, 
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginVertical: 5,
+    alignItems: "center",
+    opacity: 0.9,
+    width:width * 0.8,
+  },
+  answerText: {
+    fontSize:13,
+    color: "#fff",
+    fontWeight: "700",
+    textAlign:"left"
+  },
+   contador:{
+    position:"absolute",
+    alignSelf:"center"
+  }
+});
+
+
+/*
 import React, { useEffect, useRef } from "react";
 import {
   View,
@@ -16,8 +160,7 @@ import AmarillaTarjeta from "../assets/imagenes/amarilla.webp"
 const { width,height } = Dimensions.get("window");
 
  const shorter = Math.min(width, height)
-    
-    /*Iphone*/
+  
 
     const textPreguntaIphone = shorter <= 360 ? 17 : shorter >= 400 ? 23 : 19
     const textRespuestaIphone =shorter <= 360  ?12 : shorter >= 400 ? 16 : 13
@@ -29,7 +172,7 @@ const { width,height } = Dimensions.get("window");
     const borderRadiosPreguntaIphone =10
     const borderRadiosRespuestaIphone =12
    
-    /*tablet*/
+   
 
     const textPreguntaTablet =shorter <=650 ? 20 :shorter > 650 && shorter <= 800 ? 25 : shorter >= 1000 ? 35 : 30
     const textRespuestaTablet =shorter <=650 ? 18 :shorter > 650 && shorter <= 800  ?20 : shorter >= 1000 ? 30 : 25
@@ -199,12 +342,4 @@ const styles = StyleSheet.create({
     textAlign:"left"
   }
 });
-
-
-/*
-
-<View style={styles.counterContainer}>
-            <Text style={[styles.counterText]}>10</Text>
-              </View>
-
 */

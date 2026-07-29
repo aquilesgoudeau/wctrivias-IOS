@@ -1,3 +1,335 @@
+import React, { useEffect, useRef, useState,useContext } from "react";
+import {
+  View,
+  Text,
+  Dimensions,
+  StyleSheet,
+  Pressable,
+  Animated,
+  SafeAreaView,
+  
+} from "react-native";
+import * as Device from 'expo-device'
+import CountDownTimer from "./countdownTimer";
+import {playSound} from "../utilities/playSound"
+import { Context as GameContext} from "../contexts/gameContext"
+
+const { width,height } = Dimensions.get('screen');
+
+  export default function Jugar() {
+  const {state,jugarTorneo} = useContext(GameContext)
+
+  const [testClick,setClick] = useState(true)
+  const opacity = useRef(new Animated.Value(0)).current;
+
+  const {indexJuego,dataTorneo} = state
+
+  const preguntaCompleta = dataTorneo.preguntas[indexJuego]
+  const menuRespuestas = dataTorneo.menuRespuestas[indexJuego]
+   
+   const crearSonido = async () =>{
+     await playSound(require('../assets/sonidos/ball.wav'),0.03)
+   } 
+ 
+   useEffect(()=>{
+     crearSonido()
+   },[])
+
+  useEffect(() => {
+     Animated.timing(opacity,{
+       toValue:1,
+       useNativeDriver:true,
+       delay:800,
+       duration:2000
+     }).start(()=>setClick(false))
+     }, []);
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <Animated.View style={[styles.wrapper,{opacity:opacity}]}>
+        
+         <View style={[styles.container]}>
+           
+                                      
+              <View style={styles.questionContainer}>
+                <Text style={[styles.questionText]}>
+                  {preguntaCompleta}
+                    </Text>
+                        </View>
+
+          <View style={styles.answerList}>
+            {menuRespuestas.map((respuesta, index) => (
+              <Pressable onPress={()=> jugarTorneo(respuesta,index)}
+               key={index} style={styles.answerButton} disabled={testClick}>
+                <Text style={[styles.answerText,{fontSize:13}]}>
+                  {respuesta}
+                   </Text>
+                    </Pressable>
+                      ))}
+                      </View>
+                        </View>
+                          <View style={styles.contador}>
+                            <CountDownTimer testRespuesta={dataTorneo.respuestas}  testMenuRespuestas={dataTorneo.menuRespuestas}  indexjuego={indexJuego} jugarTorneo={jugarTorneo}/>
+                              </View>
+                          </Animated.View>
+                           </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+ safeArea: {
+    flex: 1
+  },
+  wrapper: {
+    flex: 1,
+    marginTop:30
+  },
+  container: {
+    flexGrow: 1,
+    justifyContent:"flex-start",  //justContentTest,
+    alignItems: "center",
+    paddingVertical: 10,
+    marginTop:10
+  },
+  
+  counterContainer: {
+    margin:1
+  },
+  counterText: {
+    fontSize:14, //counterTest,
+    fontWeight: "800",
+    color: "#fcfaf7",
+    borderColor: "#fcfaf7",
+    opacity:1
+  },
+  questionContainer: {
+    backgroundColor: "#e6f0ff",
+    padding: 25,
+    borderRadius:10, //borderRadiosPregunta,
+    marginBottom: 20,
+    width:width*0.9, //widthPregunta,
+    alignItems: "center",
+    opacity: 0.9,
+    marginTop:20,
+    marginBottom:30
+  },
+  questionText: {
+    fontSize:19,
+    color: "#800000",
+    fontWeight: "900",
+    textAlign: "center",
+  },
+  answerList: {
+    width:width * 0.8, //widthRespuesta,
+    marginTop:20,
+    gap: 10,
+    //alignItems: "center",
+  },
+  answerButton: {
+    backgroundColor: "#003d99",
+    borderColor: "#fff",
+    borderWidth: 3,
+    borderRadius:10, 
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginVertical: 5,
+    alignItems: "center",
+    opacity: 0.9,
+    width:width * 0.8,//widthRespuesta
+  },
+  answerText: {
+    fontSize:13,
+    color: "#fff",
+    fontWeight: "700",
+    textAlign:"left"
+  },
+   contador:{
+    position:"absolute",
+    alignSelf:"center"
+  }
+});
+/*
+
+ onPress={()=>jugarTorneo(respuesta,index)}
+
+import React, { useEffect, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  Dimensions,
+  StyleSheet,
+  Pressable,
+  Animated,
+  SafeAreaView,
+  
+} from "react-native";
+import * as Device from 'expo-device'
+import CountDownTimer from "./countdownTimer";
+import {playSound} from "../utilities/playSound"
+import Imagen from "./components/imagen"
+
+const { width,height } = Dimensions.get('screen');
+
+  export default function Jugar({dataTorneo,indexJuego,jugarTorneo}) {
+
+  const [testClick,setClick] = useState(true)
+  const opacity = useRef(new Animated.Value(0)).current;
+  const preguntaCompleta = dataTorneo.preguntas[indexJuego]
+  const menuRespuestas = dataTorneo.menuRespuestas[indexJuego]
+   
+   const crearSonido = async () =>{
+     await playSound(require('../assets/sonidos/ball.wav'),0.03)
+   } 
+ 
+   useEffect(()=>{
+     crearSonido()
+   },[])
+ 
+
+  useEffect(() => {
+     Animated.timing(opacity,{
+       toValue:1,
+       useNativeDriver:true,
+       delay:800,
+       duration:2000
+     }).start(()=>setClick(false))
+     }, []);
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <Animated.View style={[styles.wrapper,{opacity:opacity}]}>
+         <View style={[styles.container]}>
+            <View style={[{flexDirection:"row",margin:3,alignSelf:"center",marginTop:100}]}>
+                {state.arrayHeader.map((item, index) => (
+                  <Imagen key={index} item={item} width={30} height={30} margin={3} />
+                      ))}
+                  </View>
+                                      
+              <View style={styles.questionContainer}>
+                <Text style={[styles.questionText]}>
+                  {preguntaCompleta}
+                    </Text>
+                        </View>
+
+          <View style={styles.answerList}>
+            {menuRespuestas.map((respuesta, index) => (
+              <Pressable onPress={()=>jugarTorneo(respuesta,index)} key={index} style={styles.answerButton} disabled={testClick}>
+                <Text style={[styles.answerText,{fontSize:13}]}>
+                  {respuesta}
+                   </Text>
+                    </Pressable>
+                      ))}
+                      </View>
+                        </View>
+                           
+                          </Animated.View>
+                           </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+ safeArea: {
+    flex: 1
+  },
+  wrapper: {
+    flex: 1,
+    marginTop:30
+  },
+  container: {
+    flexGrow: 1,
+    justifyContent:"flex-start",  //justContentTest,
+    alignItems: "center",
+    paddingVertical: 10,
+    marginTop:10
+  },
+  
+  counterContainer: {
+    margin:1
+  },
+  counterText: {
+    fontSize:14, //counterTest,
+    fontWeight: "800",
+    color: "#fcfaf7",
+    borderColor: "#fcfaf7",
+    opacity:1
+  },
+  questionContainer: {
+    backgroundColor: "#e6f0ff",
+    padding: 25,
+    borderRadius:10, //borderRadiosPregunta,
+    marginBottom: 20,
+    width:width*0.9, //widthPregunta,
+    alignItems: "center",
+    opacity: 0.9,
+    marginTop:20,
+    marginBottom:30
+  },
+  questionText: {
+    fontSize:19,
+    color: "#800000",
+    fontWeight: "900",
+    textAlign: "center",
+  },
+  answerList: {
+    width:width * 0.8, //widthRespuesta,
+    marginTop:20,
+    gap: 10,
+    //alignItems: "center",
+  },
+  answerButton: {
+    backgroundColor: "#003d99",
+    borderColor: "#fff",
+    borderWidth: 3,
+    borderRadius:10, 
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginVertical: 5,
+    alignItems: "center",
+    opacity: 0.9,
+    width:width * 0.8,//widthRespuesta
+  },
+  answerText: {
+    fontSize:13,
+    color: "#fff",
+    fontWeight: "700",
+    textAlign:"left"
+  },
+   contador:{
+    position:"absolute",
+    alignSelf:"center"
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ <View style={styles.contador}>
+                                <CountDownTimer testRespuesta={dataTorneo.respuestas}  testMenuRespuestas={dataTorneo.menuRespuestas}  indexjuego={indexJuego} jugarTorneo={jugarTorneo}/>
+                                   </View>
+
+
+
+
 import React, { useEffect, useRef, useState } from "react";
 import {
   View,
@@ -173,11 +505,5 @@ const styles = StyleSheet.create({
     alignSelf:"center"
   }
 });
-/*
-
- <View style={styles.counterContainer}>
-                 <CountDownTimer testRespuesta={dataTorneo.respuestas}  testMenuRespuestas={dataTorneo.menuRespuestas}  indexjuego={indexJuego} jugarTorneo={jugarTorneo} ayudaTimer={ayudaTimer}/>
-                  </View>
-
 */
 

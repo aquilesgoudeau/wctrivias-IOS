@@ -1,3 +1,108 @@
+import {useState, useContext} from "react";
+import { View, Text, Pressable, StyleSheet, Modal, Dimensions } from "react-native";
+import RewardedInterstitialAdUtility from "../utilities/rewardIntertitialUtility";
+import * as Device from 'expo-device'
+import { Context as GameContext} from "../contexts/gameContext"
+
+const { width, height } = Dimensions.get("window");
+
+export default function CustomModal({isVisible}) {
+
+const {state,setOption,otraOportunidad} = useContext(GameContext)
+
+const {mostrarPublicidad} = state
+
+const { isAdLoaded, showAd } = RewardedInterstitialAdUtility(otraOportunidad); 
+
+
+const pregunta = mostrarPublicidad[0];
+const condicion = mostrarPublicidad[1];
+const aceptar = mostrarPublicidad[2];
+const cancelar = mostrarPublicidad[3];
+
+ return (
+    <Modal transparent animationType="fade" visible={isVisible}>
+      <View style={styles.overlay}>
+        <View style={styles.container}>
+          <Text style={[styles.pregunta,{fontSize:20}]}>{pregunta}</Text>
+          <Text style={[styles.condicion,{fontSize:16}]}>{condicion}</Text>
+          <View style={styles.buttonsContainer}>
+            {
+              isAdLoaded ? 
+                 <Pressable style={styles.buttonAccept} onPress={()=>{showAd()}} >
+                   <Text style={styles.buttonText}>{aceptar}</Text>
+                     </Pressable>
+                        :
+                         <Pressable style={styles.buttonAccept}  onPress={()=>{otraOportunidad(1)}}>
+                           <Text style={styles.buttonText}>{aceptar}</Text>
+                             </Pressable>
+            } 
+            <Pressable style={styles.buttonCancel} onPress={()=>{setOption('8') }} >
+              <Text style={styles.buttonText}>{cancelar}</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    //backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  container: {
+    backgroundColor: "#fff",
+    padding: 25,
+    borderRadius: 16,
+    width:width*0.8,
+    alignItems: "center",
+  },
+  pregunta: {
+    //fontSize: 20,
+    fontWeight: "bold",
+    color: "#800000",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  condicion: {
+    //fontSize: 16,
+    color: "#333",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  buttonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  buttonAccept: {
+    flex: 1,
+    backgroundColor: "#3bd46e",
+     paddingVertical: 10,
+    marginHorizontal: 5,
+    borderRadius: 8,
+  },
+  buttonCancel: {
+    flex: 1,
+    backgroundColor: "#0066ff",
+     paddingVertical: 10,
+    marginHorizontal: 5,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
+    textAlign: "center",
+    fontSize:14
+  },
+});
+
+
+/*
 import {useState} from "react";
 import { View, Text, Pressable, StyleSheet, Modal, Dimensions } from "react-native";
 import RewardedInterstitialAdUtility from "../utilities/rewardIntertitialUtility";
@@ -117,3 +222,7 @@ const styles = StyleSheet.create({
     fontSize:textLink
   },
 });
+
+
+
+*/

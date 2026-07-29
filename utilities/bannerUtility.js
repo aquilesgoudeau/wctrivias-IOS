@@ -1,3 +1,5 @@
+
+
 import {useState,useEffect} from "react"
 import {View,StyleSheet,Platform,Dimensions,AppState} from "react-native"
 import {BannerAd,BannerAdSize,TestIds} from "react-native-google-mobile-ads"
@@ -60,3 +62,4 @@ const styles = StyleSheet.create({
        height:100
        }
 })
+

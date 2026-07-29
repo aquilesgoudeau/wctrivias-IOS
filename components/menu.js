@@ -1,3 +1,44 @@
+import {useContext} from "react"
+import Dificultad from "./dificultad";
+import Idiomas from "./idiomas";
+import Inicio from "./inicio";
+import Jugar from "./jugar";
+import Torneos from "./torneos";
+import Goal from "./goal"
+import Amarilla from "./amarilla";
+import Roja from "./roja";
+import JuegoTerminado from "./juegoTerminado";
+import Campion from "./campeon";
+import { Context as gameContext } from "../contexts/gameContext";
+
+export default function Menu(){
+    const {state} = useContext(gameContext)
+    const option = state.option
+    
+                    switch(option){
+                        case '1':
+                            return <Idiomas/>
+                        case '2':
+                            return <Torneos/>
+                        case '3':
+                            return <Dificultad/>
+                        case '4':
+                            return <Jugar/>
+                        case '5':
+                            return <Goal/>
+                        case '6':
+                            return <Amarilla/>
+                        case '7':
+                            return <Roja/>
+                        case '8':
+                            return <JuegoTerminado/>
+                        case '9':
+                            return <Campion/>
+                        default:
+                            return <Inicio/>
+                    }
+}
+/*
 import Dificultad from "./dificultad";
 import Idiomas from "./idiomas";
 import Inicio from "./inicio";
@@ -40,3 +81,5 @@ export default function Menu({
     }
 }
 //prepareApp={prepareApp}
+
+*/
