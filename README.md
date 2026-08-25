@@ -2,6 +2,8 @@
 
 A fun, fast-paced, and challenging mobile trivia game celebrating the history of international football / soccer finals. Test your tournament knowledge, score goals with correct answers, survive yellow cards, and reach the final to be crowned champion!
 
+📲 **[Download on the App Store](https://apps.apple.com/us/app/wctrivias/id6747020946)**
+
 ---
 
 ## 📸 Screenshots
