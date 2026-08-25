@@ -42,3 +42,22 @@ A fun, fast-paced, and challenging mobile trivia game celebrating the history of
 ```bash
 # Build for iOS (IPA) via EAS Cloud
 eas build --platform ios --profile production
+
+# Publish an OTA update (JS/asset changes without a new binary)
+eas update --branch production --message "Describe your update"
+
+# Submit the latest iOS build to the App Store / TestFlight
+eas submit --platform ios --profile production
+
+# Build and submit in one step
+eas build --platform ios --profile production --auto-submit
+
+# List recent builds
+eas build:list --platform ios
+
+# View build details / logs
+eas build:view [BUILD_ID]
+
+# Configure or inspect EAS project settings
+eas build:configure
+```
