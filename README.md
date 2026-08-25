@@ -35,13 +35,10 @@ A fun, fast-paced, and challenging mobile trivia game celebrating the history of
 ## ⚡ Build & Release Strategy (Expo EAS)
 
 > ⚠️ **Important Build Notice:**  
-> This project **does NOT** rely on local native IDE build steps (direct local Xcode / Android Studio Gradle builds).  
+> This project **does NOT** rely on local native IDE build steps (direct local Xcode build).  
 > All production, preview, and testing binaries are built and distributed using **Expo Application Services (EAS Build)** in the cloud.
 
 ### Build Commands with EAS:
 ```bash
-# Build for Android (AAB / APK) via EAS Cloud
-eas build --platform android --profile production
-
 # Build for iOS (IPA) via EAS Cloud
 eas build --platform ios --profile production
